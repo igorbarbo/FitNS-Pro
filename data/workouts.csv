@@ -3,14 +3,49 @@ import random
 import os
 from datetime import datetime, timedelta
 
-# Criar pasta data se não existir
+# Criar pasta data
 os.makedirs("data", exist_ok=True)
 
-# Lista de exercícios simples para evitar problemas
+# --- EXERCISES ---
 exercises = ["Agachamento","Supino Reto","Remada Curvada","Flexão","Abdominal",
              "Levantamento Terra","Pull Up","Prancha","Leg Press","Rosca Bíceps"]
+goals = ["Gain","Lose"]
+levels = ["Beginner","Intermediate","Advanced"]
+equipments = ["None","Dumbbell","Barbell","Machine","Cable"]
+muscles = ["Legs","Chest","Back","Arms","Shoulders","Abs","Core","Glutes"]
 
-# Gerar 500 linhas
+exercise_rows = []
+for i in range(500):
+    exercise_rows.append({
+        "Exercise": random.choice(exercises) + f" {i+1}",
+        "Goal": random.choice(goals),
+        "Level": random.choice(levels),
+        "Equipment": random.choice(equipments),
+        "Muscle": random.choice(muscles)
+    })
+
+df_exercises = pd.DataFrame(exercise_rows)
+df_exercises.to_csv("data/exercises_500.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
+
+# --- FOODS ---
+foods = ["Arroz","Peito de Frango","Ovo","Banana","Batata Doce","Aveia",
+         "Leite Integral","Queijo","Salmão","Amêndoas","Iogurte Natural",
+         "Macarrão Integral","Carne Moída","Feijão Preto","Batata Inglesa"]
+
+food_rows = []
+for i in range(500):
+    food_rows.append({
+        "Food": random.choice(foods) + f" {i+1}",
+        "Calories": random.randint(50,600),
+        "Protein": round(random.uniform(0,40),1),
+        "Carbs": round(random.uniform(0,80),1),
+        "Fat": round(random.uniform(0,50),1)
+    })
+
+df_foods = pd.DataFrame(food_rows)
+df_foods.to_csv("data/foods_500.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
+
+# --- WORKOUTS ---
 workouts = []
 start_date = datetime(2026, 1, 1)
 for i in range(500):
@@ -22,8 +57,7 @@ for i in range(500):
         "Sets": random.randint(2,5)
     })
 
-# Criar DataFrame e salvar corretamente
-df = pd.DataFrame(workouts)
-df.to_csv("data/workouts.csv", index=False, encoding="utf-8")
+df_workouts = pd.DataFrame(workouts)
+df_workouts.to_csv("data/workouts.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
 
-print("✅ workouts.csv criado corretamente na pasta data/")
+print("✅ Todos os CSVs criados corretamente, sem erros de citação.")
