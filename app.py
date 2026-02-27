@@ -1,36 +1,38 @@
 import streamlit as st
-from pages import dashboard, treino, nutricao, progresso
+import os
+
+# Importar páginas
+from pages import treino, nutricao, progresso
+
+# --- Função para criar caminho absoluto seguro para CSVs ---
+def get_data_path(filename):
+    return os.path.join(os.path.dirname(__file__), "data", filename)
 
 # Configuração da página
 st.set_page_config(page_title="FitNS Pro", layout="wide")
 
-# CSS customizado
-st.markdown(
-    """
-    <style>
-    body {background-color: #0e1117;}
-    h1,h2,h3,h4,h5,h6 {color: #4da6ff;}
-    .stButton>button {
-        background-color:#1f2937;
-        color:white;
-        border-radius:10px;
-        height:3em;
-        width:100%;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.title("FitNS Pro 💪")
 
-# Navegação usando Sidebar
-menu = st.sidebar.radio("Menu", ["Dashboard", "Treino", "Nutrição", "Progresso"])
+# Menu inferior tipo app nativo
+menu_options = ["Dashboard", "Treino", "Nutrição", "Progresso"]
+menu = st.sidebar.radio("Menu", menu_options)
 
-# Mostra a página escolhida
+# --- Dashboard ---
 if menu == "Dashboard":
-    dashboard.show_dashboard()
+    st.subheader("🏠 Dashboard")
+    st.markdown("Aqui vai o resumo de treinos, nutrição e progresso.")
+
+# --- Treino ---
 elif menu == "Treino":
-    treino.show_treino()
+    st.subheader("💪 Treino")
+    treino.show_treino(get_data_path)
+
+# --- Nutrição ---
 elif menu == "Nutrição":
-    nutricao.show_nutricao()
+    st.subheader("🥗 Nutrição")
+    nutricao.show_nutricao(get_data_path)
+
+# --- Progresso ---
 elif menu == "Progresso":
-    progresso.show_progresso()
+    st.subheader("📊 Progresso")
+    progresso.show_progresso(get_data_path)
