@@ -1,0 +1,63 @@
+import pandas as pd
+import random
+import os
+from datetime import datetime, timedelta
+
+# Criar pasta data
+os.makedirs("data", exist_ok=True)
+
+# --- EXERCISES ---
+exercises = ["Agachamento","Supino Reto","Remada Curvada","Flexão","Abdominal",
+             "Levantamento Terra","Pull Up","Prancha","Leg Press","Rosca Bíceps"]
+goals = ["Gain","Lose"]
+levels = ["Beginner","Intermediate","Advanced"]
+equipments = ["None","Dumbbell","Barbell","Machine","Cable"]
+muscles = ["Legs","Chest","Back","Arms","Shoulders","Abs","Core","Glutes"]
+
+exercise_rows = []
+for i in range(500):
+    exercise_rows.append({
+        "Exercise": random.choice(exercises) + f" {i+1}",
+        "Goal": random.choice(goals),
+        "Level": random.choice(levels),
+        "Equipment": random.choice(equipments),
+        "Muscle": random.choice(muscles)
+    })
+
+df_exercises = pd.DataFrame(exercise_rows)
+df_exercises.to_csv("data/exercises_500.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
+
+# --- FOODS ---
+foods = ["Arroz","Peito de Frango","Ovo","Banana","Batata Doce","Aveia",
+         "Leite Integral","Queijo","Salmão","Amêndoas","Iogurte Natural",
+         "Macarrão Integral","Carne Moída","Feijão Preto","Batata Inglesa"]
+
+food_rows = []
+for i in range(500):
+    food_rows.append({
+        "Food": random.choice(foods) + f" {i+1}",
+        "Calories": random.randint(50,600),
+        "Protein": round(random.uniform(0,40),1),
+        "Carbs": round(random.uniform(0,80),1),
+        "Fat": round(random.uniform(0,50),1)
+    })
+
+df_foods = pd.DataFrame(food_rows)
+df_foods.to_csv("data/foods_500.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
+
+# --- WORKOUTS ---
+workouts = []
+start_date = datetime(2026, 1, 1)
+for i in range(500):
+    workouts.append({
+        "Date": (start_date + timedelta(days=i)).strftime("%Y-%m-%d"),
+        "Exercise": random.choice(exercises) + f" {random.randint(1,500)}",
+        "Weight": random.randint(10,100),
+        "Reps": random.randint(5,15),
+        "Sets": random.randint(2,5)
+    })
+
+df_workouts = pd.DataFrame(workouts)
+df_workouts.to_csv("data/workouts.csv", index=False, encoding="utf-8", quotechar='"', quoting=1, line_terminator='\n')
+
+print("✅ Todos os CSVs criados corretamente, sem erros de citação.")
