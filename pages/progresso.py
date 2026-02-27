@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
-def show_progresso():
-    st.title("📊 Progresso")
-    df = pd.read_csv("data/workouts.csv")
-    if df.empty:
-        st.info("Nenhum treino registrado")
-        return
-    fig = px.line(df, x="Date", y="Load", color="Exercise")
-    st.plotly_chart(fig, use_container_width=True)
+def show_progresso(get_data_path):
+    # Lê o CSV usando a função segura
+    df = pd.read_csv(get_data_path("workouts.csv"))
+    
+    st.write("### Últimos treinos")
+    st.dataframe(df.head(20))
+
+    # Exemplo: gráfico simples de evolução de peso
+    st.line_chart(df[['Weight']])
