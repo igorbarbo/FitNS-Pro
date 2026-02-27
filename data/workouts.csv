@@ -6,28 +6,24 @@ from datetime import datetime, timedelta
 # Criar pasta data se não existir
 os.makedirs("data", exist_ok=True)
 
-# Cabeçalho e lista de exercícios
-exercises = [
-    "Agachamento", "Supino Reto", "Remada Curvada", "Flexão", "Abdominal",
-    "Levantamento Terra", "Pull Up", "Prancha", "Leg Press", "Rosca Bíceps"
-]
+# Lista de exercícios simples para evitar problemas
+exercises = ["Agachamento","Supino Reto","Remada Curvada","Flexão","Abdominal",
+             "Levantamento Terra","Pull Up","Prancha","Leg Press","Rosca Bíceps"]
 
-# Gerar 500 linhas de treino
+# Gerar 500 linhas
 workouts = []
 start_date = datetime(2026, 1, 1)
 for i in range(500):
     workouts.append({
         "Date": (start_date + timedelta(days=i)).strftime("%Y-%m-%d"),
         "Exercise": random.choice(exercises) + f" {random.randint(1,500)}",
-        "Weight": random.randint(10, 100),
-        "Reps": random.randint(5, 15),
-        "Sets": random.randint(2, 5)
+        "Weight": random.randint(10,100),
+        "Reps": random.randint(5,15),
+        "Sets": random.randint(2,5)
     })
 
-# Criar DataFrame
+# Criar DataFrame e salvar corretamente
 df = pd.DataFrame(workouts)
-
-# Salvar CSV com encoding UTF-8 e sem problemas de formatação
 df.to_csv("data/workouts.csv", index=False, encoding="utf-8")
 
 print("✅ workouts.csv criado corretamente na pasta data/")
