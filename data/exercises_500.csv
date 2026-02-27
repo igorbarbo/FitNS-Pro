@@ -1,0 +1,44 @@
+Exercise,Goal,Level,Equipment,Muscle
+Agachamento,Gain,Beginner,Barbell,Legs
+Supino Reto,Gain,Beginner,Barbell,Chest
+Remada Curvada,Gain,Beginner,Dumbbell,Back
+Flexão,Lose,Beginner,None,Chest
+Abdominal,Lose,Beginner,None,Abs
+Levantamento Terra,Gain,Intermediate,Barbell,Legs
+Pull Up,Gain,Intermediate,None,Back
+Prancha,Lose,Beginner,None,Core
+Leg Press,Gain,Intermediate,Machine,Legs
+Rosca Bíceps,Gain,Beginner,Dumbbell,Arms
+Afundo,Gain,Intermediate,Dumbbell,Legs
+Crossover,Gain,Intermediate,Cable,Chest
+Tríceps Corda,Gain,Beginner,Cable,Arms
+Elevação Lateral,Gain,Beginner,Dumbbell,Shoulders
+Flexão Diamante,Lose,Intermediate,None,Chest
+Crunch,Gain,Beginner,None,Abs
+Stiff,Gain,Intermediate,Barbell,Legs
+Barra Fixa,Lose,Intermediate,None,Back
+Supino Inclinado,Gain,Intermediate,Barbell,Chest
+Agachamento Sumô,Gain,Intermediate,Dumbbell,Legs
+Rosca Martelo,Gain,Intermediate,Dumbbell,Arms
+Puxada Frente,Gain,Intermediate,Cable,Back
+Tríceps Testa,Gain,Intermediate,Barbell,Arms
+Abdominal Oblíquo,Lose,Intermediate,None,Abs
+Step Up,Gain,Intermediate,Dumbbell,Legs
+Peck Deck,Gain,Intermediate,Machine,Chest
+Remada Unilateral,Gain,Intermediate,Dumbbell,Back
+Elevação Frontal,Gain,Intermediate,Dumbbell,Shoulders
+Flexão Decline,Lose,Intermediate,None,Chest
+Prancha Lateral,Lose,Intermediate,None,Core
+Agachamento Frontal,Gain,Advanced,Barbell,Legs
+Supino com Halteres,Gain,Advanced,Dumbbell,Chest
+Remada Curvada Pesada,Gain,Advanced,Barbell,Back
+Afundo Búlgaro,Gain,Advanced,Dumbbell,Legs
+Barra Fixa Pesada,Gain,Advanced,None,Back
+Rosca Concentrada,Gain,Advanced,Dumbbell,Arms
+Tríceps Pulley,Gain,Advanced,Cable,Arms
+Crunch com Peso,Lose,Advanced,Dumbbell,Abs
+Levantamento Terra Romeno,Gain,Advanced,Barbell,Legs
+Pull Over,Gain,Advanced,Dumbbell,Chest
+Elevação Posterior,Gain,Advanced,Dumbbell,Shoulders
+Abdominal Bicicleta,Lose,Advanced,None,Abs
+... (replicar e variar para completar 500 linhas)
