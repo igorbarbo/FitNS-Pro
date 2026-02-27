@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
 
-def show_treino():
-    st.title("💪 Treino")
-    df = pd.read_csv("data/exercises_500.csv")
-    goal = st.selectbox("Objetivo", df["Goal"].unique())
-    level = st.selectbox("Nível", df["Level"].unique())
-    filtered = df[(df["Goal"]==goal) & (df["Level"]==level)]
-    st.dataframe(filtered.head(50))
+def show_treino(get_data_path):
+    df = pd.read_csv(get_data_path("exercises_500.csv"))
+    
+    st.write("### Biblioteca de exercícios")
+    st.dataframe(df.head(20))
