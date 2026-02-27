@@ -6,26 +6,28 @@ from datetime import datetime, timedelta
 # Criar pasta data se não existir
 os.makedirs("data", exist_ok=True)
 
-# Lista de exercícios baseada no exercises_500.csv
-exercises = [f"Agachamento {i+1}" for i in range(50)] + \
-            [f"Supino Reto {i+1}" for i in range(50)] + \
-            [f"Remada Curvada {i+1}" for i in range(50)] + \
-            [f"Flexão {i+1}" for i in range(50)] + \
-            [f"Abdominal {i+1}" for i in range(50)]
+# Cabeçalho e lista de exercícios
+exercises = [
+    "Agachamento", "Supino Reto", "Remada Curvada", "Flexão", "Abdominal",
+    "Levantamento Terra", "Pull Up", "Prancha", "Leg Press", "Rosca Bíceps"
+]
 
-# Gerar 500 linhas
+# Gerar 500 linhas de treino
 workouts = []
 start_date = datetime(2026, 1, 1)
 for i in range(500):
-    workout = {
+    workouts.append({
         "Date": (start_date + timedelta(days=i)).strftime("%Y-%m-%d"),
-        "Exercise": random.choice(exercises),
+        "Exercise": random.choice(exercises) + f" {random.randint(1,500)}",
         "Weight": random.randint(10, 100),
         "Reps": random.randint(5, 15),
         "Sets": random.randint(2, 5)
-    }
-    workouts.append(workout)
+    })
 
-df_workouts = pd.DataFrame(workouts)
-df_workouts.to_csv("data/workouts.csv", index=False)
-print("✅ workouts.csv criado com 500 linhas na pasta data/")
+# Criar DataFrame
+df = pd.DataFrame(workouts)
+
+# Salvar CSV com encoding UTF-8 e sem problemas de formatação
+df.to_csv("data/workouts.csv", index=False, encoding="utf-8")
+
+print("✅ workouts.csv criado corretamente na pasta data/")
