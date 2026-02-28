@@ -1,125 +1,51 @@
-"""
-Módulo de Treinos
-"""
+# pages/workout.py
 import streamlit as st
-import pandas as pd
-from datetime import datetime
-from utils.data_manager import load_csv, save_csv, load_json, save_json
+from modules.header import render_header
+from modules.navigation import render_navigation
 
-def render_workout():
-    """Renderiza o módulo de treinos"""
-    st.header("💪 Módulo de Treino")
-    st.markdown("---")
+def show():
+    user = st.session_state.user
+    render_header(user)
+    render_navigation()
+    st.markdown('<div class="slide-in">', unsafe_allow_html=True)
     
-    # Carrega dados
-    exercises_df = load_csv("exercises.csv")
-    if exercises_df.empty:
-        from utils.data_manager import get_default_exercises
-        exercises_df = get_default_exercises()
-        save_csv(exercises_df, "exercises.csv")
+    st.markdown("""
+    <div style="margin-bottom: 20px;">
+        <h2 style="margin:0; font-size: 24px;">🏋️ Treinos</h2>
+        <p style="color: #8b8b9a; font-size: 12px; margin-top: 5px;">Seu plano de treino</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    user_data = load_json("user_data.json")
+    # Treino do dia em destaque
+    st.markdown("""
+    <div class="glass-card" style="border: 2px solid #00d4ff; background: rgba(0,212,255,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <span style="background: #00d4ff; color: #000; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800;">HOJE</span>
+            <span style="color: #8b8b9a; font-size: 12px;">⏱️ 60 min</span>
+        </div>
+        <h3 style="margin:0; font-size: 20px; margin-bottom: 10px;">Treino A - Superiores</h3>
+        <div style="font-size: 12px; color: #8b8b9a; margin-bottom: 15px;">Peito • Ombros • Tríceps • Abdômen</div>
+        <button class="btn-neon">Iniciar Treino</button>
+    </div>
+    """, unsafe_allow_html=True)
     
-    tab1, tab2, tab3 = st.tabs(["🎯 Meu Treino", "📚 Biblioteca", "➕ Registrar"])
+    # Próximos treinos
+    workouts = [("Amanhã", "Treino B - Inferiores", "Quadríceps • Posterior", "#10b981"),
+                ("Quarta", "Treino C - Costas", "Dorsais • Bíceps", "#ffb800"),
+                ("Quinta", "Descanso Ativo", "Cardio Leve", "#8b8b9a")]
     
-    with tab1:
-        st.subheader("Seu Plano de Treino")
-        
-        if 'profile' not in user_data or not user_data['profile']:
-            st.warning("Configure sua meta na Balança primeiro!")
-        else:
-            goal = user_data['profile'].get('goal', 'manter_peso')
-            
-            # Gera plano baseado no objetivo
-            if goal == 'perder_gordura':
-                plan = {
-                    "Segunda": ["Supino Reto", "Agachamento", "Puxada Frontal", "Prancha"],
-                    "Terça": ["Corrida", "Burpee", "Jump Rope"],
-                    "Quarta": ["Desenvolvimento", "Leg Press", "Remada Curvada", "Crunch"],
-                    "Quinta": ["Bicicleta", "Elíptico", "Burpee"],
-                    "Sexta": ["Supino Inclinado", "Stiff", "Elevação Lateral", "Panturrilha"],
-                    "Sábado": ["Cardio LISS", "Prancha", "Russian Twist"]
-                }
-            elif goal == 'ganhar_musculo':
-                plan = {
-                    "Segunda": ["Supino Reto", "Desenvolvimento", "Tríceps Corda", "Crucifixo"],
-                    "Terça": ["Agachamento", "Leg Press", "Stiff", "Panturrilha"],
-                    "Quarta": ["Puxada Frontal", "Remada Curvada", "Rosca Direta", "Barra Fixa"],
-                    "Quinta": ["Supino Inclinado", "Elevação Lateral", "Tríceps Testa", "Francês"],
-                    "Sexta": ["Levantamento Terra", "Cadeira Extensora", "Mesa Flexora", "Prancha"],
-                    "Sábado": ["Cardio leve", "Core completo"]
-                }
-            else:  # manter
-                plan = {
-                    "Segunda": ["Supino Reto", "Agachamento", "Puxada Frontal"],
-                    "Terça": ["Corrida", "Prancha"],
-                    "Quarta": ["Desenvolvimento", "Leg Press", "Remada Unilateral"],
-                    "Quinta": ["Bicicleta", "Abdominais"],
-                    "Sexta": ["Peito completo", "Costas completas"]
-                }
-            
-            selected_day = st.selectbox("Dia da semana", list(plan.keys()))
-            st.markdown(f"**Treino de {selected_day}:**")
-            
-            for exercise in plan[selected_day]:
-                col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
-                with col1:
-                    st.write(f"🏋️ {exercise}")
-                with col2:
-                    sets = st.number_input(f"Séries {exercise}", 1, 10, 3, key=f"sets_{exercise}")
-                with col3:
-                    reps = st.number_input(f"Reps {exercise}", 1, 50, 10, key=f"reps_{exercise}")
-                with col4:
-                    weight = st.number_input(f"Carga(kg) {exercise}", 0.0, 500.0, 20.0, key=f"weight_{exercise}")
+    for day, title, muscles, color in workouts:
+        st.markdown(f"""
+        <div class="glass-card" style="opacity: 0.8;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div style="font-size: 10px; color: {color}; font-weight: 600; margin-bottom: 4px;">{day}</div>
+                    <div style="font-size: 16px; font-weight: 700; margin-bottom: 4px;">{title}</div>
+                    <div style="font-size: 11px; color: #8b8b9a;">{muscles}</div>
+                </div>
+                <div style="color: #8b8b9a;">›</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
-    with tab2:
-        st.subheader("Biblioteca de Exercícios")
-        
-        # Filtros
-        col1, col2 = st.columns(2)
-        with col1:
-            muscle_filter = st.multiselect("Grupo Muscular", exercises_df['muscle'].unique())
-        with col2:
-            equip_filter = st.multiselect("Equipamento", exercises_df['equipment'].unique())
-        
-        filtered = exercises_df
-        if muscle_filter:
-            filtered = filtered[filtered['muscle'].isin(muscle_filter)]
-        if equip_filter:
-            filtered = filtered[filtered['equipment'].isin(equip_filter)]
-        
-        st.dataframe(filtered, use_container_width=True, hide_index=True)
-    
-    with tab3:
-        st.subheader("Registrar Treino Realizado")
-        
-        with st.form("workout_log"):
-            date = st.date_input("Data", datetime.now())
-            exercise = st.selectbox("Exercício", exercises_df['name'].tolist())
-            sets = st.number_input("Séries", 1, 20, 3)
-            reps = st.number_input("Repetições", 1, 100, 10)
-            weight = st.number_input("Carga (kg)", 0.0, 500.0, 20.0)
-            notes = st.text_area("Observações")
-            
-            if st.form_submit_button("Salvar Treino"):
-                if 'workouts' not in user_data:
-                    user_data['workouts'] = []
-                
-                user_data['workouts'].append({
-                    'date': str(date),
-                    'exercise': exercise,
-                    'sets': sets,
-                    'reps': reps,
-                    'weight': weight,
-                    'notes': notes,
-                    'volume': sets * reps * weight
-                })
-                save_json(user_data, "user_data.json")
-                st.success("Treino registrado!")
-        
-        # Histórico recente
-        if 'workouts' in user_data and user_data['workouts']:
-            st.markdown("### Últimos Treinos")
-            recent = pd.DataFrame(user_data['workouts'][-10:])
-            st.dataframe(recent, use_container_width=True)
-          
+    st.markdown('</div>', unsafe_allow_html=True)
