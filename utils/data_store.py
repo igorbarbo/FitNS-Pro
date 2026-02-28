@@ -61,4 +61,77 @@ class DataStore:
         data = self._load_data()
         if user_id not in data["meals"]:
             data["meals"][user_id] = []
-        data["meals"][user_id].append(asdict(meal
+        data["meals"][user_id].append(asdict(meal))
+        self._save_data(data)
+        self._update_daily_stats(user_id)
+    
+    def delete_meal(self, user_id: str, meal_id: str):
+        data = self._load_data()
+        if user_id in data["meals"]:
+            data["meals"][user_id] = [m for m in data["meals"][user_id] if m["id"] != meal_id]
+            self._save_data(data)
+            self._update_daily_stats(user_id)
+    
+    def get_today_stats(self, user_id: str) -> DailyStats:
+        data = self._load_data()
+        today = datetime.now().strftime("%Y-%m-%d")
+        stats = data.get("daily_stats", {}).get(user_id, {}).get(today)
+        if stats:
+            return DailyStats(**stats)
+        return DailyStats(date=today)
+    
+    def _update_daily_stats(self, user_id: str):
+        data = self._load_data()
+        today = datetime.now().strftime("%Y-%m-%d")
+        meals = self.get_today_meals(user_id)
+        
+        total_calories = sum(m.calories for m in meals)
+        total_protein = sum(m.protein for m in meals)
+        total_carbs = sum(m.carbs for m in meals)
+        total_fat = sum(m.fat for m in meals)
+        
+        if user_id not in data["daily_stats"]:
+            data["daily_stats"][user_id] = {}
+        
+        # Preserva água e treinos já registrados
+        current_stats = data["daily_stats"][user_id].get(today, {})
+        data["daily_stats"][user_id][today] = {
+            "date": today,
+            "calories_consumed": total_calories,
+            "calories_goal": Config.DEFAULT_CALORIES_GOAL,
+            "protein_consumed": round(total_protein, 1),
+            "protein_goal": Config.DEFAULT_PROTEIN_GOAL,
+            "carbs_consumed": round(total_carbs, 1),
+            "fat_consumed": round(total_fat, 1),
+            "water_consumed": current_stats.get("water_consumed", 0),
+            "water_goal": Config.DEFAULT_WATER_GOAL,
+            "workouts_completed": current_stats.get("workouts_completed", 0),
+            "workouts_goal": 5
+        }
+        self._save_data(data)
+    
+    def add_water(self, user_id: str, amount: float = 0.3):
+        data = self._load_data()
+        today = datetime.now().strftime("%Y-%m-%d")
+        if user_id not in data["daily_stats"]:
+            data["daily_stats"][user_id] = {}
+        if today not in data["daily_stats"][user_id]:
+            data["daily_stats"][user_id][today] = asdict(DailyStats(date=today))
+        
+        current = data["daily_stats"][user_id][today].get("water_consumed", 0)
+        data["daily_stats"][user_id][today]["water_consumed"] = round(current + amount, 1)
+        self._save_data(data)
+    
+    def get_weight_history(self, user_id: str) -> List[Dict]:
+        data = self._load_data()
+        return data.get("weight_history", [])
+    
+    def add_weight_entry(self, user_id: str, weight: float):
+        data = self._load_data()
+        entry = {
+            "date": datetime.now().strftime("%Y-%m-%d"),
+            "weight": weight,
+            "timestamp": datetime.now().isoformat()
+        }
+        data["weight_history"].append(entry)
+        self._save_data(data)
