@@ -15,6 +15,7 @@ def show():
     render_navigation()
     st.markdown('<div class="slide-in">', unsafe_allow_html=True)
     
+    # Card principal de calorias
     progress = (stats.calories_consumed / stats.calories_goal) * 100
     st.markdown(f"""
     <div class="glass-card" style="background: linear-gradient(135deg, rgba(255,75,43,0.1), rgba(255,65,108,0.1)); border: 1px solid rgba(255,75,43,0.3);">
@@ -38,6 +39,7 @@ def show():
     </div>
     """, unsafe_allow_html=True)
     
+    # Macros em duas colunas
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
@@ -51,6 +53,7 @@ def show():
         render_progress_bar("Gorduras 🥑", fat, 80, "#ffb800", "g")
         st.markdown('</div>', unsafe_allow_html=True)
     
+    # Água
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     water_progress = (stats.water_consumed / stats.water_goal) * 100
     water_glasses = int(stats.water_consumed / 0.3)
@@ -73,7 +76,8 @@ def show():
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
-    st.markdown("""
+    # Card do próximo treino (apenas conteúdo)
+    st.markdown(f"""
     <div class="glass-card" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), 
                                     url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600'); 
                                     background-size: cover; background-position: center; min-height: 160px;
@@ -87,12 +91,15 @@ def show():
             <h2 style="margin: 0; font-size: 24px; font-weight: 800;">Superiores - Dia A</h2>
             <p style="color: #8b8b9a; font-size: 12px; margin-top: 5px;">Peito, Ombros e Tríceps</p>
         </div>
-        <div style="margin-top: 20px;">
-            <button class="btn-neon" style="width: auto; padding: 12px 30px; display: inline-block;">Iniciar Treino</button>
-        </div>
     </div>
     """, unsafe_allow_html=True)
     
+    # Botão funcional abaixo do card
+    if st.button("🏋️ Iniciar Treino", key="start_workout", use_container_width=True):
+        st.session_state.page = "workout"
+        st.rerun()
+    
+    # Gráfico de evolução de peso
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;'>"
                 "<span style='font-weight: 700; font-size: 14px;'>📊 Evolução de Peso</span>"
@@ -115,6 +122,7 @@ def show():
     )
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
     
+    # Métricas rápidas
     cols = st.columns(3)
     metrics = [("🔥", "12", "Treinos", "#ff4b2b"), ("⚡", "8,450", "Kcal", "#00d4ff"), ("💪", "78.5", "Kg", "#10b981")]
     for col, (icon, value, label, color) in zip(cols, metrics):
