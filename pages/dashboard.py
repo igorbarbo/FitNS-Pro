@@ -15,7 +15,6 @@ def show():
     render_navigation()
     st.markdown('<div class="slide-in">', unsafe_allow_html=True)
     
-    # Card principal de calorias
     progress = (stats.calories_consumed / stats.calories_goal) * 100
     st.markdown(f"""
     <div class="glass-card" style="background: linear-gradient(135deg, rgba(255,75,43,0.1), rgba(255,65,108,0.1)); border: 1px solid rgba(255,75,43,0.3);">
@@ -39,7 +38,6 @@ def show():
     </div>
     """, unsafe_allow_html=True)
     
-    # Macros em duas colunas
     col1, col2 = st.columns(2)
     with col1:
         st.markdown('<div class="glass-card">', unsafe_allow_html=True)
@@ -53,7 +51,6 @@ def show():
         render_progress_bar("Gorduras 🥑", fat, 80, "#ffb800", "g")
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Água
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     water_progress = (stats.water_consumed / stats.water_goal) * 100
     water_glasses = int(stats.water_consumed / 0.3)
@@ -76,7 +73,6 @@ def show():
             st.rerun()
     st.markdown('</div>', unsafe_allow_html=True)
     
-    # Próximo treino (card com imagem)
     st.markdown("""
     <div class="glass-card" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.4)), 
                                     url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600'); 
@@ -97,7 +93,6 @@ def show():
     </div>
     """, unsafe_allow_html=True)
     
-    # Gráfico de evolução de peso
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown("<div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;'>"
                 "<span style='font-weight: 700; font-size: 14px;'>📊 Evolução de Peso</span>"
@@ -120,7 +115,6 @@ def show():
     )
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
     
-    # Métricas rápidas
     cols = st.columns(3)
     metrics = [("🔥", "12", "Treinos", "#ff4b2b"), ("⚡", "8,450", "Kcal", "#00d4ff"), ("💪", "78.5", "Kg", "#10b981")]
     for col, (icon, value, label, color) in zip(cols, metrics):
