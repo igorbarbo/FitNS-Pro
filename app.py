@@ -1,198 +1,140 @@
 import streamlit as st
 import plotly.graph_objects as go
+import time
 from datetime import datetime
 
-# --- CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(
-    page_title="FitNS Pro",
-    page_icon="⚡",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
+# --- 1. CONFIGURAÇÃO DA PÁGINA ---
+st.set_page_config(page_title="FitNS Pro", layout="wide", initial_sidebar_state="collapsed")
 
-# --- CSS CUSTOMIZADO (ESTILO GLASSMORPHISM & NEON) ---
+# --- 2. INICIALIZAÇÃO DE ESTADOS (O que faz as funções funcionarem) ---
+if 'tempo_segundos' not in st.session_state:
+    st.session_state.tempo_segundos = 1725  # Começa em 28:45 como na foto
+if 'timer_rodando' not in st.session_state:
+    st.session_state.timer_rodando = False
+if 'agua_atual' not in st.session_state:
+    st.session_state.agua_atual = 2.4
+if 'proteina_atual' not in st.session_state:
+    st.session_state.proteina_atual = 110
+
+# Lógica do Cronômetro
+if st.session_state.timer_rodando:
+    time.sleep(1)
+    st.session_state.tempo_segundos += 1
+    st.rerun()
+
+# --- 3. ESTILO CSS (Glassmorphism & Cores Neon) ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
-    
-    * { font-family: 'Inter', sans-serif; color: #fff; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    * { font-family: 'Inter', sans-serif; color: white; }
     .stApp { background-color: #08090f; }
     
-    /* Ajustes de Container */
-    .block-container { padding-top: 1.5rem; }
-    header { visibility: hidden; }
+    /* Remove bordas brancas dos botões do Streamlit */
+    div.stButton > button {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 10px; width: 100%;
+    }
     
-    /* Glassmorphism Card */
+    /* Card de Vidro */
     .glass-card {
         background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(15px);
+        backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 20px;
-        padding: 20px;
-        margin-bottom: 15px;
+        border-radius: 20px; padding: 15px; margin-bottom: 10px;
     }
-    
-    /* Botão Verde Neon */
-    .btn-neon {
-        background: #10b981;
-        color: white !important;
-        border: none;
-        padding: 12px;
-        border-radius: 12px;
-        font-weight: 800;
-        width: 100%;
-        cursor: pointer;
-        text-align: center;
-        text-decoration: none;
-        display: block;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-    }
-
-    /* Barras de Macro */
-    .macro-bg { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 5px; }
-    .macro-fill { height: 100%; border-radius: 10px; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- HEADER ---
-col_logo, _, col_user = st.columns([1.5, 1, 1.5])
-with col_logo:
-    st.markdown("<h2 style='margin:0;'>⚡ FitNS <span style='color:#00d4ff'>Pro</span></h2>", unsafe_allow_html=True)
-with col_user:
+# --- 4. CABEÇALHO ---
+c1, _, c2 = st.columns([2, 1, 2])
+with c1:
+    st.markdown("## ⚡ FitNS <span style='color:#00d4ff'>Pro</span>", unsafe_allow_html=True)
+with c2:
+    st.markdown(f"""<div style='text-align:right;'><b>Igor Silva</b><br><span style='color:#10b981; font-size:12px;'>Plano Premium</span></div>""", unsafe_allow_html=True)
+
+# --- 5. LAYOUT PRINCIPAL (3 Colunas como na foto) ---
+col_esq, col_meio, col_dir = st.columns([1, 1.6, 1.2])
+
+# COLUNA ESQUERDA: METAS
+with col_esq:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.write("Calorias Hoje 🔥")
+    st.markdown("### 1850 <span style='font-size:14px; color:#888;'>/ 2200 kcal</span>", unsafe_allow_html=True)
+    st.progress(0.84)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.write(f"Água: {st.session_state.agua_atual:.1f}L 💧")
+    st.progress(st.session_state.agua_atual / 3.0)
+    if st.button("🥤 Beber +250ml"):
+        st.session_state.agua_atual = min(3.0, st.session_state.agua_atual + 0.25)
+        st.rerun()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+# COLUNA CENTRAL: TREINO E TIMER
+with col_meio:
+    # Card de Treino Ativo
     st.markdown("""
-    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
-        <div style="text-align: right;">
-            <div style="font-weight: 700; font-size: 14px;">Igor Silva</div>
-            <div style="font-size: 11px; color: #10b981;">Plano Premium</div>
-        </div>
-        <div style="width: 42px; height: 42px; background: #1a1b26; border: 1px solid #00d4ff; border-radius: 50%; display: flex; align-items: center; justify-content: center;">👤</div>
+    <div style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1000'); 
+                background-size: cover; border-radius: 20px; padding: 20px; border: 1px solid #10b981;">
+        <p style="color:#888; margin:0;">Treino Ativo</p>
+        <h2 style="margin:0;">Pernas - Dia 4</h2>
+        <h1 style="color:#00d4ff; font-family:monospace; margin:10px 0;">
+            {0}
+        </h1>
     </div>
-    """, unsafe_allow_html=True)
-
-# --- NAVEGAÇÃO SUPERIOR ---
-st.markdown("""
-<div style="display: flex; gap: 25px; margin: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; font-size: 14px;">
-    <span style="color: #00d4ff; border-bottom: 2px solid #00d4ff; padding-bottom: 10px; font-weight: 600;">Dashboard</span>
-    <span style="opacity: 0.5;">Treino</span>
-    <span style="opacity: 0.5;">Nutrição</span>
-    <span style="opacity: 0.5;">Progresso</span>
-</div>
-""", unsafe_allow_html=True)
-
-# --- LAYOUT PRINCIPAL (3 COLUNAS) ---
-col1, col2, col3 = st.columns([1, 1.6, 1.1])
-
-# COLUNA 1: METAS RÁPIDAS
-with col1:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 11px; color: #8b8b9a; margin-bottom: 5px;'>Calorias Hoje 🔥</p>", unsafe_allow_html=True)
-    st.markdown("<h2 style='margin:0;'>1850 <span style='font-size: 14px; color: #8b8b9a;'>/ 2200 kcal</span></h2>", unsafe_allow_html=True)
-    st.markdown("<div style='height: 4px; background: linear-gradient(90deg, #ff4b2b, #ff416c); width: 84%; border-radius: 10px; margin-top: 15px;'></div>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 11px; color: #8b8b9a;'>Proteína 💪</p>", unsafe_allow_html=True)
-    st.markdown("<h3 style='margin:0;'>125g <span style='font-size: 14px; opacity: 0.5;'>/ 150g</span></h3>", unsafe_allow_html=True)
-    st.markdown('<div class="macro-bg"><div class="macro-fill" style="width: 83%; background: #00d4ff;"></div></div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<p style='font-size: 11px; color: #8b8b9a;'>Água 💧</p>", unsafe_allow_html=True)
-    st.markdown("<h3 style='margin:0;'>2.4 <span style='font-size: 14px; opacity: 0.5;'>/ 3.0 L</span></h3>", unsafe_allow_html=True)
-    st.markdown("<div style='font-size: 20px; margin-top: 10px;'>💧 💧 💧 <span style='opacity:0.2'>💧</span></div>", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# COLUNA 2: TREINO ATIVO E GRÁFICO
-with col2:
-    # Card Central de Treino
-    st.markdown("""
-    <div style="background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1000'); 
-                background-size: cover; border-radius: 25px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); min-height: 220px;">
-        <div style="float: right; background: rgba(0,0,0,0.6); padding: 5px 12px; border-radius: 10px; font-size: 12px;">35:00 min</div>
-        <p style="color: #8b8b9a; margin-bottom: 5px; font-size: 12px;">Treino Ativo</p>
-        <h1 style="margin: 0; font-size: 32px;">Pernas - Dia 4</h1>
-        <div style="margin-top: 30px; width: 150px;">
-            <div class="btn-neon">Iniciar Treino</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    """.format(time.strftime('%H:%M:%S', time.gmtime(st.session_state.tempo_segundos))), unsafe_allow_html=True)
     
-    st.write("") 
-    
-    # Gráfico de Evolução
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown("<div style='display: flex; justify-content: space-between;'><span>Progresso Semanal</span><span style='color: #10b981; font-weight: bold;'>+5.2 kg</span></div>", unsafe_allow_html=True)
-    
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(
-        x=['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], 
-        y=[75, 76, 75.8, 77.2, 78.5, 78, 78.5],
-        mode='lines+markers', line=dict(color='#00d4ff', width=3),
-        fill='tozeroy', fillcolor='rgba(0, 212, 255, 0.1)', marker=dict(size=6)
-    ))
-    fig.update_layout(
-        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
-        margin=dict(l=0, r=0, t=10, b=0), height=180,
-        xaxis=dict(showgrid=False, color="#8b8b9a", tickfont=dict(size=10)),
-        yaxis=dict(showgrid=False, showticklabels=False)
-    )
+    # Controles do Timer
+    ts1, ts2, ts3 = st.columns(3)
+    with ts1:
+        if st.button("▶ Iniciar"):
+            st.session_state.timer_rodando = True
+            st.rerun()
+    with ts2:
+        if st.button("⏸ Pausar"):
+            st.session_state.timer_rodando = False
+            st.rerun()
+    with ts3:
+        if st.button("⏹ Finalizar"):
+            st.session_state.timer_rodando = False
+            st.session_state.tempo_segundos = 0
+            st.balloons()
+            st.rerun()
+
+    # Gráfico de Progresso
+    fig = go.Figure(go.Scatter(x=['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'], 
+                               y=[75, 76, 75.8, 77.2, 78.5, 78, 78.5], 
+                               fill='tozeroy', line_color='#00d4ff'))
+    fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', 
+                      height=180, margin=dict(l=0,r=0,t=0,b=0), xaxis=dict(showgrid=False))
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+# COLUNA DIREITA: NUTRIÇÃO
+with col_dir:
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+    st.write("Nutrição Hoje 🥗")
+    if st.button("+ Adicionar Alimento"):
+        st.info("Aqui você abriria um formulário de busca!")
     
-    # Métricas do Rodapé do Gráfico
-    c_a, c_b, c_c = st.columns(3)
-    c_a.markdown("<div style='text-align:center;'><p style='color:#8b8b9a; font-size:9px; margin:0;'>TREINOS</p><b>12/15</b></div>", unsafe_allow_html=True)
-    c_b.markdown("<div style='text-align:center;'><p style='color:#8b8b9a; font-size:9px; margin:0;'>CALORIAS</p><b>8,480</b></div>", unsafe_allow_html=True)
-    c_c.markdown("<div style='text-align:center;'><p style='color:#8b8b9a; font-size:9px; margin:0;'>PESO</p><b>78.5 kg</b></div>", unsafe_allow_html=True)
+    alimentos = [("Arroz Branco", "200g - 260kcal"), ("Frango Grelhado", "150g - 248kcal")]
+    for nome, info in alimentos:
+        st.markdown(f"""<div style='background:rgba(255,255,255,0.03); padding:8px; border-radius:10px; margin-top:5px;'>
+                    <b>{nome}</b><br><small style='color:#888'>{info}</small></div>""", unsafe_allow_html=True)
+    
+    st.markdown("<br><b>Macros</b>", unsafe_allow_html=True)
+    st.write(f"Proteína: {st.session_state.proteina_atual}g")
+    st.progress(st.session_state.proteina_atual / 150)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# COLUNA 3: DIÁRIO ALIMENTAR
-with col3:
-    st.markdown('<div class="glass-card" style="height: 100%;">', unsafe_allow_html=True)
-    st.markdown("<div style='display: flex; justify-content: space-between; margin-bottom: 20px;'><span>Nutrição Hoje</span><span>⚙️</span></div>", unsafe_allow_html=True)
-    
-    # Botão Adicionar
-    st.markdown("<div style='background: #00d4ff; color: #000; text-align: center; padding: 10px; border-radius: 12px; font-weight: 800; margin-bottom: 20px; font-size: 13px;'>+ Adicionar Alimento</div>", unsafe_allow_html=True)
-    
-    alimentos = [
-        ("🍚 Arroz Branco", "200g - 260 kcal", "#00d4ff"),
-        ("🍗 Frango Grelhado", "150g - 248 kcal", "#10b981"),
-        ("🥚 Ovos", "2 un - 140 kcal", "#ff4b2b"),
-        ("🍎 Maçã", "1 un - 95 kcal", "#ff4b2b")
-    ]
-    
-    for nome, info, cor in alimentos:
-        st.markdown(f"""
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: rgba(255,255,255,0.02); padding: 10px; border-radius: 12px;">
-            <div>
-                <div style="font-size: 12px; font-weight: 600;">{nome}</div>
-                <div style="font-size: 10px; color: #8b8b9a;">{info}</div>
-            </div>
-            <div style="color: {cor}; font-size: 10px;">🔥</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    st.markdown("<hr style='border:0; border-top:1px solid rgba(255,255,255,0.05); margin:15px 0;'>", unsafe_allow_html=True)
-    
-    # Resumo de Macros
-    for m, v, meta, c in [("Proteína", 110, 150, "#00d4ff"), ("Carbo", 220, 250, "#10b981"), ("Gordura", 65, 80, "#ffb800")]:
-        p = (v/meta)*100
-        st.markdown(f"""
-        <div style="margin-bottom: 8px;">
-            <div style="display: flex; justify-content: space-between; font-size: 10px;"><span>{m}</span><span>{v}g</span></div>
-            <div class="macro-bg"><div class="macro-fill" style="width: {p}%; background: {c};"></div></div>
-        </div>
-        """, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-
-# --- NAVEGAÇÃO INFERIOR FIXA ---
+# --- 6. NAVEGAÇÃO INFERIOR (Simulada) ---
 st.markdown("""
-<div style="position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); 
-            background: rgba(15, 17, 26, 0.85); backdrop-filter: blur(20px); 
-            padding: 10px 35px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; gap: 40px; z-index: 1000;">
-    <div style="text-align: center; color: #10b981;"><div style="font-size: 18px;">🏠</div><div style="font-size: 8px;">Início</div></div>
-    <div style="text-align: center; opacity: 0.4;"><div style="font-size: 18px;">🏋️</div><div style="font-size: 8px;">Treino</div></div>
-    <div style="text-align: center; opacity: 0.4;"><div style="font-size: 18px;">🥗</div><div style="font-size: 8px;">Nutrição</div></div>
-    <div style="text-align: center; opacity: 0.4;"><div style="font-size: 18px;">📈</div><div style="font-size: 8px;">Progresso</div></div>
+<div style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); 
+            background: rgba(15, 17, 26, 0.9); padding: 10px 40px; border-radius: 30px; 
+            display: flex; gap: 30px; border: 1px solid rgba(255,255,255,0.1); z-index: 1000;">
+    <span style="color:#10b981">🏠 Início</span>
+    <span style="opacity:0.5">🏋️ Treino</span>
+    <span style="opacity:0.5">🥗 Nutrição</span>
 </div>
 """, unsafe_allow_html=True)
