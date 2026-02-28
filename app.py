@@ -3,7 +3,7 @@ import streamlit as st
 from config import Config
 from styles import load_css
 from utils.services import FitnessService
-from pages import login, dashboard, nutrition, workout, progress, profile   # <-- adicione profile
+from pages import login, dashboard, nutrition, workout, progress, profile
 
 # Configuração da página
 st.set_page_config(
@@ -27,7 +27,7 @@ def init_session_state():
 
 init_session_state()
 
-# Roteamento
+# Roteamento das páginas
 if st.session_state.user is None:
     login.show()
 else:
@@ -36,11 +36,4 @@ else:
         dashboard.show()
     elif page == "nutrition":
         nutrition.show()
-    elif page == "workout":
-        workout.show()
-    elif page == "progress":
-        progress.show()
-    elif page == "profile":
-        profile.show()
-    else:
-        dashboard.show()
+    elif
