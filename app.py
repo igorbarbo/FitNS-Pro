@@ -1,4 +1,4 @@
-"""
+code = '''"""
 FitNS Pro v2.0 - Aplicativo Moderno de Fitness
 Tema escuro com glassmorphism
 """
@@ -21,6 +21,7 @@ body { background: #0f0f1a; color: #fff; }
 @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.4); } 50% { box-shadow: 0 0 30px rgba(0,212,255,0.6); } }
 </style>
 """, unsafe_allow_html=True)
+
 USUARIO = {"nome": "Alexandre", "plano": "Premium", "notificacoes": 3}
 NUTRICAO = {"calorias": {"atual": 1850, "meta": 2200}, "proteina": {"atual": 140, "meta": 180}, "agua": {"atual": 2.4, "meta": 3.0}, "carbos": {"atual": 180, "meta": 250}, "gorduras": {"atual": 55, "meta": 70}}
 PROGRESSO = {"dias": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"], "peso": [79.2, 79.0, 78.8, 78.9, 78.6, 78.5, 78.5], "variacao": "-0.8kg"}
@@ -31,7 +32,8 @@ ALIMENTOS = [("🍳", "Ovos Mexidos", "3 ovos • 280 kcal", 280, True), ("🍌"
 if 'timer_running' not in st.session_state: st.session_state.timer_running = False
 if 'timer_start' not in st.session_state: st.session_state.timer_start = None
 if 'elapsed' not in st.session_state: st.session_state.elapsed = timedelta(0)
-    st.markdown(f"""
+
+st.markdown(f"""
 <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 24px;">
     <div>
         <h1 style="margin: 0; font-size: 32px; font-weight: 800; background: linear-gradient(135deg, #fff, #00d4ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">FitNS Pro</h1>
@@ -45,6 +47,7 @@ if 'elapsed' not in st.session_state: st.session_state.elapsed = timedelta(0)
 """, unsafe_allow_html=True)
 
 tab_inicio, tab_treino, tab_nutricao, tab_progresso = st.tabs(["🏠 Início", "💪 Treino", "🥗 Nutrição", "📈 Progresso"])
+
 with tab_inicio:
     col_esq, col_centro, col_dir = st.columns([1, 1.6, 1])
     with col_esq:
@@ -80,7 +83,7 @@ with tab_inicio:
             <button class="btn-glow" style="width: 100%;">Ver Treino</button>
         </div>
         """, unsafe_allow_html=True)
-     with col_centro:
+    with col_centro:
         st.markdown("""
         <div class="glass" style="padding: 24px; margin-bottom: 20px; border: 1px solid rgba(0,212,255,0.2);">
             <div style="height: 140px; background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(123,44,191,0.1)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 64px; margin-bottom: 16px;">🦵</div>
@@ -132,7 +135,7 @@ with tab_inicio:
             </div>
             """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
-      with col_dir:
+    with col_dir:
         nutri_content = '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;"><span style="color: #8b8b9a; font-size: 13px;">🥗 Nutrição Hoje</span><span style="font-size: 18px; cursor: pointer;">🔄</span></div><button class="btn-glow" style="width: 100%; margin-bottom: 16px; padding: 12px; font-size: 14px;">+ Adicionar Alimento</button>'
         for icon, nome, detalhes, cal, fire in ALIMENTOS: nutri_content += f"""
         <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 12px; margin-bottom: 8px;">
@@ -153,6 +156,7 @@ with tab_inicio:
             """
         nutri_content += "</div>"
         st.markdown(f'<div class="glass" style="padding: 20px;">{nutri_content}</div>', unsafe_allow_html=True)
+
 with tab_treino:
     st.markdown('<div style="margin-bottom: 24px;"><h2 style="font-size: 24px; margin-bottom: 4px;">💪 Meus Treinos</h2><p style="color: #8b8b9a; font-size: 14px;">Escolha seu treino de hoje</p></div>', unsafe_allow_html=True)
     cols = st.columns(3)
@@ -175,6 +179,7 @@ with tab_treino:
         <p style="color: #6b6b7b; font-size: 13px;">Monte seu próprio plano</p>
     </div>
     """, unsafe_allow_html=True)
+
 with tab_nutricao:
     st.markdown('<div style="margin-bottom: 24px;"><h2 style="font-size: 24px; margin-bottom: 4px;">🥗 Diário Alimentar</h2><p style="color: #8b8b9a; font-size: 14px;">Acompanhe suas macros</p></div>', unsafe_allow_html=True)
     cols = st.columns(4)
@@ -206,7 +211,8 @@ with tab_nutricao:
             {itens_html}
         </div>
         """, unsafe_allow_html=True)
-        with tab_progresso:
+
+with tab_progresso:
     st.markdown('<div style="margin-bottom: 24px;"><h2 style="font-size: 24px; margin-bottom: 4px;">📈 Sua Evolução</h2><p style="color: #8b8b9a; font-size: 14px;">Acompanhe suas métricas</p></div>', unsafe_allow_html=True)
     cols = st.columns(4)
     for i, (label, dias) in enumerate([("7 Dias", "7d"), ("30 Dias", "30d"), ("3 Meses", "3m"), ("1 Ano", "1a")]):
@@ -231,24 +237,4 @@ with tab_nutricao:
                 <div style="font-size: 12px; color: #10b981;">{mudanca} ↓</div>
             </div>
             """, unsafe_allow_html=True)
-    col_sec1, col_sec2 = st.columns(2)
-    with col_sec1:
-        st.markdown('<div class="glass" style="padding: 20px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="margin-bottom: 16px; font-size: 16px;">💪 Volume de Treino</h3>', unsafe_allow_html=True)
-        semanas = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
-        volume = [1200, 1350, 1400, 1550, 1600, 1750]
-        fig = go.Figure(go.Bar(x=semanas, y=volume, marker_color='#3b82f6', marker_line_color='#60a5fa', marker_line_width=1))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=20, r=20, t=20, b=20), xaxis=dict(showgrid=False, tickfont=dict(color='#8b8b9a')), yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', tickfont=dict(color='#8b8b9a')), height=220)
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-        st.markdown('</div>', unsafe_allow_html=True)
-    with col_sec2:
-        st.markdown('<div class="glass" style="padding: 20px;">', unsafe_allow_html=True)
-        st.markdown('<h3 style="margin-bottom: 16px; font-size: 16px;">🎯 Consistência</h3>', unsafe_allow_html=True)
-        dias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-        sems = ['S1', 'S2', 'S3', 'S4']
-        matriz = [[1,1,0,1,1,0,1],[1,1,1,0,1,1,0],[0,1,1,1,1,0,1],[1,1,1,1,0,1,1]]
-        fig = go.Figure(data=go.Heatmap(z=matriz, x=dias, y=sems, colorscale=[[0, 'rgba(255,255,255,0.05)'], [1, '#00d4ff']], showscale=False))
-        fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=20, r=20, t=20, b=20), height=220)
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-        st.markdown('</div>', unsafe_allow_html=True)
-        
+ 
