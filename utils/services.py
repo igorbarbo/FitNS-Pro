@@ -11,7 +11,6 @@ class FitnessService:
         self.store = DataStore()
     
     def authenticate(self, email: str, password: str) -> Optional[User]:
-        # Gera um ID simples baseado no email
         user_id = hashlib.md5(email.encode()).hexdigest()[:8]
         user = User(
             id=user_id,
@@ -38,7 +37,6 @@ class FitnessService:
         }
     
     def _generate_weekly_data(self, history: List[Dict]) -> List[float]:
-        # Gera dados simulados de peso para a semana
         if len(history) >= 7:
             return [h["weight"] for h in history[-7:]]
         base_weight = 78.5
