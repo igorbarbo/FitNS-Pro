@@ -1,21 +1,17 @@
 # pages/progress.py
 import streamlit as st
 import plotly.graph_objects as go
-from datetime import datetime, timedelta
 from modules.header import render_header
 from modules.navigation import render_navigation
 from utils.helpers import calculate_bmi
 
 def show():
-    """Página de progresso com histórico de peso e métricas."""
     try:
         user = st.session_state.user
         service = st.session_state.service
         store = service.store
 
-        # Obtém histórico de peso
         weight_history = store.get_weight_history(user.id)
-        # Obtém perfil para exibir IMC atual
         profile = store.get_user_profile(user.id)
 
         render_header(user)
@@ -29,7 +25,6 @@ def show():
         </div>
         """, unsafe_allow_html=True)
 
-        # Métricas principais
         col1, col2, col3 = st.columns(3)
         with col1:
             if profile:
@@ -50,10 +45,9 @@ def show():
             workouts = store.get_today_stats(user.id).workouts_completed
             col3.metric("Treinos no Mês", workouts, "meta: 5")
 
-        # Gráfico de evolução de peso (se houver dados)
         if len(weight_history) >= 2:
             st.markdown("### 📊 Histórico de Peso")
-            dates = [entry["date"] for entry in weight_history[-10:]]  # últimos 10
+            dates = [entry["date"] for entry in weight_history[-10:]]
             weights = [entry["weight"] for entry in weight_history[-10:]]
 
             fig = go.Figure()
@@ -76,7 +70,6 @@ def show():
         else:
             st.info("Adicione registros de peso para visualizar o gráfico de evolução.")
 
-        # Botão para adicionar novo peso
         with st.expander("➕ Adicionar novo peso"):
             with st.form("weight_form"):
                 new_weight = st.number_input("Peso (kg)", min_value=30.0, max_value=200.0, step=0.1)
