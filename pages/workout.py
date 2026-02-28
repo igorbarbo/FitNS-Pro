@@ -1,4 +1,3 @@
-# pages/workout.py
 import streamlit as st
 from modules.header import render_header
 from modules.navigation import render_navigation
