@@ -36,4 +36,11 @@ else:
         dashboard.show()
     elif page == "nutrition":
         nutrition.show()
-    elif
+    elif page == "workout":
+        workout.show()
+    elif page == "progress":
+        progress.show()
+    elif page == "profile":
+        profile.show()
+    else:
+        dashboard.show()
