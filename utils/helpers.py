@@ -1,6 +1,4 @@
 # utils/helpers.py
-import random
-
 def calculate_bmi(weight_kg: float, height_cm: float) -> float:
     height_m = height_cm / 100
     return round(weight_kg / (height_m ** 2), 1)
@@ -52,16 +50,13 @@ def calculate_macros(weight_kg: float, total_calories: int, goal: str) -> dict:
         "carbs": carb_g
     }
 
-def generate_workout_plan(goal: str, level: str = "intermediário") -> dict:
-    """
-    Retorna um plano de treino semanal com exercícios detalhados.
-    """
+def generate_workout_plan(goal: str) -> dict:
     plans = {
         "gain": {
             "Segunda": {
                 "name": "Peito e Tríceps",
                 "exercises": [
-                    ("Supino reto", "4x8-12", "assets/supino.jpg"),
+                    ("Supino reto", "4x8-12", ""),
                     ("Crucifixo", "3x12-15", ""),
                     ("Tríceps pulley", "4x10-12", ""),
                     ("Tríceps francês", "3x12", ""),
@@ -116,7 +111,7 @@ def generate_workout_plan(goal: str, level: str = "intermediário") -> dict:
                     ("Agachamento com salto", "30s", ""),
                     ("Prancha", "30s", ""),
                     ("Mountain climber", "30s", ""),
-                    ("Descanso", "15s", "")  # repetir 4x
+                    ("Descanso", "15s", "")
                 ]
             },
             "Terça": {
@@ -196,17 +191,7 @@ def generate_workout_plan(goal: str, level: str = "intermediário") -> dict:
     }
     return plans.get(goal, plans["maintain"])
 
-def generate_meal_plan(calories: int, macros: dict, diet_type: str = "normal") -> dict:
-    """
-    Gera um plano alimentar diário com base nas calorias e macros.
-    Retorna um dicionário com refeições e alimentos aproximados.
-    """
-    # Exemplo simples – em um sistema real, você usaria um banco de alimentos
-    protein_needed = macros["protein"]
-    carbs_needed = macros["carbs"]
-    fat_needed = macros["fat"]
-
-    # Refeições típicas
+def generate_meal_plan(calories: int, macros: dict) -> dict:
     meal_plan = {
         "Café da manhã": [
             ("Ovos mexidos (2 unidades)", 140, 12, 1, 10),
@@ -233,7 +218,4 @@ def generate_meal_plan(calories: int, macros: dict, diet_type: str = "normal") -
             ("Salada verde", 50, 2, 8, 1)
         ]
     }
-
-    # Aqui você poderia ajustar quantidades para bater os macros exatos
-    # Por simplicidade, retornamos o plano fixo e calculamos os totais aproximados
     return meal_plan
