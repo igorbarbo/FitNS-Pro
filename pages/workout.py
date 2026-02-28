@@ -24,10 +24,8 @@ def show():
         </div>
         """, unsafe_allow_html=True)
 
-        # Gerar plano de treino baseado no objetivo
         workout_plan = generate_workout_plan(goal)
 
-        # Exibir os treinos dia a dia
         for day, details in workout_plan.items():
             with st.expander(f"**{day}** – {details['name']}", expanded=(day=="Segunda")):
                 for exercise, reps, _ in details["exercises"]:
