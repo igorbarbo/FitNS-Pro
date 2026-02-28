@@ -1,138 +1,111 @@
-"""
-Módulo de Nutrição
-"""
+# pages/nutrition.py
 import streamlit as st
-import pandas as pd
+import time
 from datetime import datetime
-from utils.data_manager import load_csv, load_json, save_json
+from modules.header import render_header
+from modules.navigation import render_navigation
+from modules.meal_item import render_meal_item
+from utils.models import Meal
 
-def render_nutrition():
-    """Renderiza o módulo de nutrição"""
-    st.header("🥗 Módulo de Nutrição")
-    st.markdown("---")
-    
-    # Carrega dados
-    foods_df = load_csv("foods.csv")
-    if foods_df.empty:
-        from utils.data_manager import get_default_foods
-        foods_df = get_default_foods()
-        from utils.data_manager import save_csv
-        save_csv(foods_df, "foods.csv")
-    
-    user_data = load_json("user_data.json")
-    profile = user_data.get('profile', {})
-    
-    # Metas do usuário
-    if profile:
-        target_calories = profile.get('target_calories', 2000)
-        macros = profile.get('macros', {'protein_g': 150, 'carbs_g': 200, 'fat_g': 67})
-    else:
-        target_calories = 2000
-        macros = {'protein_g': 150, 'carbs_g': 200, 'fat_g': 67}
-    
-    # Calcula totais do dia
-    today = str(datetime.now().date())
-    if 'meals' not in user_data:
-        user_data['meals'] = []
-    
-    today_meals = [m for m in user_data['meals'] if m['date'] == today]
-    total_cal = sum(m['calories'] for m in today_meals)
-    total_prot = sum(m['protein'] for m in today_meals)
-    total_carbs = sum(m['carbs'] for m in today_meals)
-    total_fat = sum(m['fat'] for m in today_meals)
-    
-    # Dashboard de macros
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.metric("Calorias", f"{total_cal}/{target_calories}", 
-                 delta=f"{target_calories - total_cal} restantes")
-    with col2:
-        st.metric("Proteínas", f"{total_prot}g/{macros['protein_g']}g")
-    with col3:
-        st.metric("Carbs", f"{total_carbs}g/{macros['carbs_g']}g")
-    with col4:
-        st.metric("Gorduras", f"{total_fat}g/{macros['fat_g']}g")
-    
-    # Barras de progresso
-    st.progress(min(total_cal / target_calories, 1.0), text=f"Calorias: {total_cal}/{target_calories}")
-    
-    tab1, tab2, tab3 = st.tabs(["🍽️ Diário", "📊 Alimentos", "💧 Água"])
-    
-    with tab1:
-        st.subheader("Registrar Refeição")
-        
-        meal_type = st.selectbox("Refeição", ["Café da Manhã", "Almoço", "Jantar", "Lanche"])
-        
-        with st.form("meal_form"):
-            food_search = st.text_input("Buscar alimento")
-            filtered_foods = foods_df[foods_df['name'].str.contains(food_search, case=False, na=False)] if food_search else foods_df
-            
-            food = st.selectbox("Alimento", filtered_foods['name'].tolist())
-            quantity = st.number_input("Quantidade (porções)", 0.1, 10.0, 1.0, 0.1)
-            
-            # Pega info do alimento selecionado
-            food_info = foods_df[foods_df['name'] == food].iloc[0]
-            
-            st.write(f"**Porção:** {food_info['portion']}")
-            st.write(f"**Calorias:** {food_info['calories'] * quantity:.0f} kcal")
-            st.write(f"**P: {food_info['protein'] * quantity:.1f}g | C: {food_info['carbs'] * quantity:.1f}g | G: {food_info['fat'] * quantity:.1f}g**")
-            
-            if st.form_submit_button("Adicionar"):
-                user_data['meals'].append({
-                    'date': today,
-                    'meal_type': meal_type,
-                    'food': food,
-                    'quantity': quantity,
-                    'calories': food_info['calories'] * quantity,
-                    'protein': food_info['protein'] * quantity,
-                    'carbs': food_info['carbs'] * quantity,
-                    'fat': food_info['fat'] * quantity
-                })
-                save_json(user_data, "user_data.json")
-                st.success(f"{food} adicionado!")
-                st.rerun()
-        
-        # Lista de refeições de hoje
-        st.markdown("### Refeições de Hoje")
-        if today_meals:
-            for meal in today_meals:
-                col1, col2, col3 = st.columns([3, 1, 1])
-                with col1:
-                    st.write(f"**{meal['meal_type']}:** {meal['food']} ({meal['quantity']}x)")
-                with col2:
-                    st.write(f"{meal['calories']:.0f} kcal")
-                with col3:
-                    st.write(f"P:{meal['protein']:.0f} C:{meal['carbs']:.0f} G:{meal['fat']:.0f}")
+def delete_meal(meal_id: str):
+    """Remove uma refeição e atualiza a página."""
+    user = st.session_state.user
+    st.session_state.service.store.delete_meal(user.id, meal_id)
+    st.rerun()
+
+def show():
+    """Página de nutrição: registro de refeições."""
+    try:
+        user = st.session_state.user
+        service = st.session_state.service
+        store = service.store
+
+        # Obtém dados do dia
+        meals = store.get_today_meals(user.id)
+        stats = store.get_today_stats(user.id)
+
+        render_header(user)
+        render_navigation()
+        st.markdown('<div class="slide-in">', unsafe_allow_html=True)
+
+        st.markdown("""
+        <div style="margin-bottom: 20px;">
+            <h2 style="margin:0; font-size: 24px;">🥗 Diário Alimentar</h2>
+            <p style="color: #8b8b9a; font-size: 12px; margin-top: 5px;">Registre suas refeições</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Cards de resumo
+        st.markdown('<div class="glass-card">', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Calorias", f"{stats.calories_consumed}", f"{stats.calories_goal - stats.calories_consumed} restantes")
+        col2.metric("Proteína", f"{stats.protein_consumed}g", f"{stats.protein_goal - stats.protein_consumed}g restantes")
+        col3.metric("Refeições", len(meals), "hoje")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Botão para adicionar refeição
+        if st.button("+ Adicionar Refeição", use_container_width=True, key="btn_add_meal"):
+            st.session_state.show_add_meal = True
+
+        # Formulário de adição (controlado por session_state)
+        if st.session_state.get('show_add_meal', False):
+            with st.form("add_meal_form", clear_on_submit=True):
+                st.markdown("<h4 style='margin-bottom: 15px;'>Nova Refeição</h4>", unsafe_allow_html=True)
+                cols = st.columns([2, 1])
+                with cols[0]:
+                    name = st.text_input("Nome do alimento", placeholder="Ex: Frango Grelhado")
+                with cols[1]:
+                    meal_type = st.selectbox("Refeição", ["breakfast", "lunch", "dinner", "snack"],
+                                            format_func=lambda x: {"breakfast": "Café", "lunch": "Almoço", "dinner": "Jantar", "snack": "Lanche"}[x])
+                cols2 = st.columns(4)
+                with cols2[0]:
+                    quantity = st.text_input("Quantidade", placeholder="200g")
+                with cols2[1]:
+                    calories = st.number_input("Kcal", min_value=0, value=0, step=10)
+                with cols2[2]:
+                    protein = st.number_input("Proteína (g)", min_value=0.0, value=0.0, step=0.1)
+                with cols2[3]:
+                    carbs = st.number_input("Carbos (g)", min_value=0.0, value=0.0, step=0.1)
+                fat = st.number_input("Gorduras (g)", min_value=0.0, value=0.0, step=0.1)
+
+                cols3 = st.columns(2)
+                with cols3[0]:
+                    if st.form_submit_button("Cancelar", use_container_width=True):
+                        st.session_state.show_add_meal = False
+                        st.rerun()
+                with cols3[1]:
+                    if st.form_submit_button("Salvar", type="primary", use_container_width=True):
+                        if name and calories > 0:
+                            meal = Meal(
+                                id=f"meal_{int(time.time())}",
+                                name=name,
+                                quantity=quantity or "1 porção",
+                                calories=calories,
+                                protein=protein,
+                                carbs=carbs,
+                                fat=fat,
+                                timestamp=datetime.now().isoformat(),
+                                meal_type=meal_type
+                            )
+                            store.add_meal(user.id, meal)
+                            st.success("Refeição adicionada!")
+                            st.session_state.show_add_meal = False
+                            time.sleep(0.3)
+                            st.rerun()
+                        else:
+                            st.error("Preencha nome e calorias!")
+
+        # Lista de refeições do dia
+        st.markdown("<h4 style='margin: 20px 0 15px 0;'>Refeições de Hoje</h4>", unsafe_allow_html=True)
+        if not meals:
+            st.info("Nenhuma refeição registrada hoje.")
         else:
-            st.info("Nenhuma refeição registrada hoje")
-    
-    with tab2:
-        st.subheader("Base de Dados de Alimentos")
-        category = st.multiselect("Categoria", foods_df['category'].unique())
-        
-        if category:
-            st.dataframe(foods_df[foods_df['category'].isin(category)], use_container_width=True)
-        else:
-            st.dataframe(foods_df, use_container_width=True)
-    
-    with tab3:
-        st.subheader("Controle de Água")
-        
-        if 'water' not in user_data:
-            user_data['water'] = []
-        
-        today_water = sum(w['amount'] for w in user_data['water'] if w['date'] == today)
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Água Hoje", f"{today_water}ml", "Meta: 3000ml")
-        with col2:
-            add_water = st.number_input("Adicionar (ml)", 100, 1000, 250, 50)
-            if st.button("💧 Registrar"):
-                user_data['water'].append({'date': today, 'amount': add_water})
-                save_json(user_data, "user_data.json")
-                st.success(f"+{add_water}ml")
-                st.rerun()
-        
-        st.progress(min(today_water / 3000, 1.0))
-      
+            for meal in sorted(meals, key=lambda x: x.timestamp, reverse=True):
+                render_meal_item(meal, on_delete=delete_meal)
+
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    except Exception as e:
+        st.error(f"Erro na página de nutrição: {e}")
+        import traceback
+        st.code(traceback.format_exc())
