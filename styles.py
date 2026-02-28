@@ -58,5 +58,7 @@ def load_css():
             color: white !important;
             padding: 12px !important;
         }
+        .st-b7 { color: white; }
+        .st-c0 { background-color: #08090f; }
     </style>
     """, unsafe_allow_html=True)
