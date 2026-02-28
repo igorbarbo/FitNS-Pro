@@ -3,7 +3,7 @@ import streamlit as st
 from config import Config
 from styles import load_css
 from utils.services import FitnessService
-from pages import login, dashboard, nutrition, workout, progress
+from pages import login, dashboard, nutrition, workout, progress, profile   # <-- adicione profile
 
 # Configuração da página
 st.set_page_config(
@@ -13,10 +13,8 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Carrega o CSS customizado
 load_css()
 
-# Inicializa o estado da sessão
 def init_session_state():
     if 'service' not in st.session_state:
         st.session_state.service = FitnessService()
@@ -29,12 +27,10 @@ def init_session_state():
 
 init_session_state()
 
-# Roteamento das páginas
+# Roteamento
 if st.session_state.user is None:
-    # Se não há usuário logado, mostra a tela de login
     login.show()
 else:
-    # Usuário logado: navega entre as páginas
     page = st.session_state.page
     if page == "dashboard":
         dashboard.show()
@@ -44,6 +40,7 @@ else:
         workout.show()
     elif page == "progress":
         progress.show()
+    elif page == "profile":
+        profile.show()
     else:
-        # Página padrão
         dashboard.show()
