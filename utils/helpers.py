@@ -1,4 +1,6 @@
 # utils/helpers.py
+from .food_database import FOODS
+
 def calculate_bmi(weight_kg: float, height_cm: float) -> float:
     height_m = height_cm / 100
     return round(weight_kg / (height_m ** 2), 1)
@@ -191,31 +193,102 @@ def generate_workout_plan(goal: str) -> dict:
     }
     return plans.get(goal, plans["maintain"])
 
-def generate_meal_plan(calories: int, macros: dict) -> dict:
-    meal_plan = {
-        "Café da manhã": [
-            ("Ovos mexidos (2 unidades)", 140, 12, 1, 10),
-            ("Pão integral (1 fatia)", 70, 3, 15, 1),
-            ("Banana (1 unidade)", 105, 1, 27, 0)
-        ],
-        "Lanche da manhã": [
-            ("Iogurte grego (1 pote)", 150, 15, 5, 8),
-            ("Castanhas (10g)", 60, 2, 2, 5)
-        ],
-        "Almoço": [
-            ("Frango grelhado (150g)", 247, 46, 0, 5),
-            ("Arroz integral (100g)", 112, 2.6, 23, 1),
-            ("Brócolis (100g)", 34, 2.8, 4, 0.4),
-            ("Azeite (1 colher)", 120, 0, 0, 14)
-        ],
-        "Lanche da tarde": [
-            ("Whey protein (1 scoop)", 120, 24, 3, 2),
-            ("Maçã (1 unidade)", 95, 0.5, 25, 0.3)
-        ],
-        "Jantar": [
-            ("Peixe grelhado (150g)", 200, 30, 0, 8),
-            ("Batata doce (150g)", 130, 2, 30, 0.2),
-            ("Salada verde", 50, 2, 8, 1)
-        ]
+def generate_meal_plan_dynamic(calories_goal: int, protein_goal: int, carb_goal: int, fat_goal: int) -> dict:
+    """
+    Gera um plano alimentar com quantidades calculadas para bater as metas.
+    Distribui as calorias em 5 refeições com percentuais fixos.
+    """
+    # Percentuais de distribuição das calorias por refeição
+    meal_distribution = {
+        "Café da manhã": 0.20,
+        "Lanche da manhã": 0.10,
+        "Almoço": 0.35,
+        "Lanche da tarde": 0.15,
+        "Jantar": 0.20
     }
+    
+    # Metas para cada refeição (calorias)
+    meal_calories = {meal: round(calories_goal * pct) for meal, pct in meal_distribution.items()}
+    
+    # Estrutura do plano
+    meal_plan = {}
+    
+    # Café da manhã: ovos, pão, banana
+    cafe = []
+    # Ovos (2 unidades ~ 100g)
+    qtd_ovo = 100  # gramas
+    cal_ovo, prot_ovo, carb_ovo, fat_ovo = [FOODS["ovo"][k] for k in ("cal", "prot", "carb", "fat")]
+    cafe.append(("Ovos (2 unidades)", qtd_ovo, cal_ovo * qtd_ovo/100, prot_ovo * qtd_ovo/100, carb_ovo * qtd_ovo/100, fat_ovo * qtd_ovo/100))
+    
+    # Pão integral (50g)
+    qtd_pao = 50
+    cal_pao, prot_pao, carb_pao, fat_pao = [FOODS["pão_integral"][k] for k in ("cal", "prot", "carb", "fat")]
+    cafe.append(("Pão integral (2 fatias)", qtd_pao, cal_pao * qtd_pao/100, prot_pao * qtd_pao/100, carb_pao * qtd_pao/100, fat_pao * qtd_pao/100))
+    
+    # Banana (100g)
+    qtd_banana = 100
+    cal_banana, prot_banana, carb_banana, fat_banana = [FOODS["banana"][k] for k in ("cal", "prot", "carb", "fat")]
+    cafe.append(("Banana", qtd_banana, cal_banana * qtd_banana/100, prot_banana * qtd_banana/100, carb_banana * qtd_banana/100, fat_banana * qtd_banana/100))
+    
+    meal_plan["Café da manhã"] = cafe
+    
+    # Lanche da manhã: iogurte + castanhas
+    lanche_manha = []
+    qtd_iogurte = 170  # 1 pote
+    cal_iog, prot_iog, carb_iog, fat_iog = [FOODS["iogurte_grego"][k] for k in ("cal", "prot", "carb", "fat")]
+    lanche_manha.append(("Iogurte grego", qtd_iogurte, cal_iog * qtd_iogurte/100, prot_iog * qtd_iogurte/100, carb_iog * qtd_iogurte/100, fat_iog * qtd_iogurte/100))
+    
+    qtd_castanha = 20
+    cal_cast, prot_cast, carb_cast, fat_cast = [FOODS["castanhas"][k] for k in ("cal", "prot", "carb", "fat")]
+    lanche_manha.append(("Castanhas", qtd_castanha, cal_cast * qtd_castanha/100, prot_cast * qtd_castanha/100, carb_cast * qtd_castanha/100, fat_cast * qtd_castanha/100))
+    
+    meal_plan["Lanche da manhã"] = lanche_manha
+    
+    # Almoço: frango, arroz, brócolis, azeite
+    almoco = []
+    qtd_frango = 200
+    cal_fr, prot_fr, carb_fr, fat_fr = [FOODS["frango_grelhado"][k] for k in ("cal", "prot", "carb", "fat")]
+    almoco.append(("Frango grelhado", qtd_frango, cal_fr * qtd_frango/100, prot_fr * qtd_frango/100, carb_fr * qtd_frango/100, fat_fr * qtd_frango/100))
+    
+    qtd_arroz = 200
+    cal_arroz, prot_arroz, carb_arroz, fat_arroz = [FOODS["arroz_integral"][k] for k in ("cal", "prot", "carb", "fat")]
+    almoco.append(("Arroz integral", qtd_arroz, cal_arroz * qtd_arroz/100, prot_arroz * qtd_arroz/100, carb_arroz * qtd_arroz/100, fat_arroz * qtd_arroz/100))
+    
+    qtd_brocolis = 100
+    cal_bro, prot_bro, carb_bro, fat_bro = [FOODS["brócolis"][k] for k in ("cal", "prot", "carb", "fat")]
+    almoco.append(("Brócolis", qtd_brocolis, cal_bro * qtd_brocolis/100, prot_bro * qtd_brocolis/100, carb_bro * qtd_brocolis/100, fat_bro * qtd_brocolis/100))
+    
+    qtd_azeite = 15
+    cal_azeite, prot_azeite, carb_azeite, fat_azeite = [FOODS["azeite"][k] for k in ("cal", "prot", "carb", "fat")]
+    almoco.append(("Azeite", qtd_azeite, cal_azeite * qtd_azeite/100, prot_azeite * qtd_azeite/100, carb_azeite * qtd_azeite/100, fat_azeite * qtd_azeite/100))
+    
+    meal_plan["Almoço"] = almoco
+    
+    # Lanche da tarde: whey + maçã
+    lanche_tarde = []
+    qtd_whey = 30  # 1 scoop
+    cal_whey, prot_whey, carb_whey, fat_whey = [FOODS["whey"][k] for k in ("cal", "prot", "carb", "fat")]
+    lanche_tarde.append(("Whey protein", qtd_whey, cal_whey * qtd_whey/100, prot_whey * qtd_whey/100, carb_whey * qtd_whey/100, fat_whey * qtd_whey/100))
+    
+    qtd_maca = 150  # 1 unidade média
+    cal_maca, prot_maca, carb_maca, fat_maca = [FOODS["maçã"][k] for k in ("cal", "prot", "carb", "fat")]
+    lanche_tarde.append(("Maçã", qtd_maca, cal_maca * qtd_maca/100, prot_maca * qtd_maca/100, carb_maca * qtd_maca/100, fat_maca * qtd_maca/100))
+    
+    meal_plan["Lanche da tarde"] = lanche_tarde
+    
+    # Jantar: peixe, batata doce, salada (brócolis)
+    jantar = []
+    qtd_peixe = 200
+    cal_peixe, prot_peixe, carb_peixe, fat_peixe = [FOODS["peixe_grelhado"][k] for k in ("cal", "prot", "carb", "fat")]
+    jantar.append(("Peixe grelhado", qtd_peixe, cal_peixe * qtd_peixe/100, prot_peixe * qtd_peixe/100, carb_peixe * qtd_peixe/100, fat_peixe * qtd_peixe/100))
+    
+    qtd_batata = 200
+    cal_bat, prot_bat, carb_bat, fat_bat = [FOODS["batata_doce"][k] for k in ("cal", "prot", "carb", "fat")]
+    jantar.append(("Batata doce", qtd_batata, cal_bat * qtd_batata/100, prot_bat * qtd_batata/100, carb_bat * qtd_batata/100, fat_bat * qtd_batata/100))
+    
+    qtd_salada = 100
+    jantar.append(("Salada verde (brócolis)", qtd_salada, cal_bro * qtd_salada/100, prot_bro * qtd_salada/100, carb_bro * qtd_salada/100, fat_bro * qtd_salada/100))
+    
+    meal_plan["Jantar"] = jantar
+    
     return meal_plan
