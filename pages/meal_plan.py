@@ -18,7 +18,6 @@ def show():
             st.warning("Você ainda não preencheu seu perfil. Vá em 'Perfil' para configurar.")
             st.stop()
 
-        # Calcula necessidades
         tmb = calculate_tmb(profile.weight, profile.height, profile.age, profile.gender)
         activity_factor = get_activity_factor(profile.activity_level)
         daily_calories = calculate_daily_calories(tmb, activity_factor, profile.goal)
@@ -35,13 +34,11 @@ def show():
         </div>
         """, unsafe_allow_html=True)
 
-        # Mostrar metas
         col1, col2, col3 = st.columns(3)
         col1.metric("Calorias", f"{daily_calories} kcal")
         col2.metric("Proteína", f"{macros['protein']}g")
         col3.metric("Carboidratos", f"{macros['carbs']}g")
 
-        # Gerar plano alimentar (simulado)
         meal_plan = generate_meal_plan(daily_calories, macros)
 
         st.markdown("### 🥗 Refeições sugeridas")
@@ -60,7 +57,6 @@ def show():
                     total_fat += fat
                 st.markdown(f"**Totais da refeição:** {total_cal} kcal, {total_prot}g prot, {total_carb}g carb, {total_fat}g fat")
 
-        # Botão para adicionar ao diário (opcional)
         if st.button("➕ Adicionar estas refeições ao diário", use_container_width=True):
             st.info("Funcionalidade em desenvolvimento: em breve você poderá adicionar todas de uma vez!")
 
