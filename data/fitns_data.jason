@@ -1,0 +1,59 @@
+{
+  "users": {
+    "usuario123": {
+      "id": "usuario123",
+      "name": "João Silva",
+      "email": "joao@email.com",
+      "plan": "Premium",
+      "avatar": "👤",
+      "created_at": "2025-01-01T10:00:00"
+    }
+  },
+  "current_user": {
+    "id": "usuario123",
+    "name": "João Silva",
+    "email": "joao@email.com",
+    "plan": "Premium",
+    "avatar": "👤",
+    "created_at": "2025-01-01T10:00:00"
+  },
+  "meals": {
+    "usuario123": [
+      {
+        "id": "meal_1710000000",
+        "name": "Frango Grelhado",
+        "quantity": "200g",
+        "calories": 330,
+        "protein": 40,
+        "carbs": 0,
+        "fat": 18,
+        "timestamp": "2025-03-01T08:30:00",
+        "meal_type": "breakfast"
+      }
+    ]
+  },
+  "daily_stats": {
+    "usuario123": {
+      "2025-03-01": {
+        "date": "2025-03-01",
+        "calories_consumed": 330,
+        "calories_goal": 2200,
+        "protein_consumed": 40,
+        "protein_goal": 150,
+        "carbs_consumed": 0,
+        "fat_consumed": 18,
+        "water_consumed": 0.3,
+        "water_goal": 3.0,
+        "workouts_completed": 0,
+        "workouts_goal": 5
+      }
+    }
+  },
+  "weight_history": [
+    {
+      "date": "2025-03-01",
+      "weight": 78.5,
+      "timestamp": "2025-03-01T08:00:00"
+    }
+  ]
+}
