@@ -6,7 +6,7 @@ from modules.navigation import render_navigation
 from utils.models import UserProfile
 from utils.helpers import (
     calculate_bmi, calculate_tmb, get_activity_factor,
-    calculate_daily_calories, calculate_macros, suggest_workout
+    calculate_daily_calories, calculate_macros, generate_workout_plan
 )
 
 def show():
@@ -25,7 +25,6 @@ def show():
     </div>
     """, unsafe_allow_html=True)
 
-    # Carregar perfil existente, se houver
     existing_profile = store.get_user_profile(user.id)
 
     with st.form("profile_form"):
@@ -83,7 +82,6 @@ def show():
         st.session_state.profile = profile
         st.rerun()
 
-    # Se já existe perfil, mostrar recomendações
     profile = existing_profile or st.session_state.get('profile')
     if profile:
         st.markdown("---")
@@ -94,7 +92,6 @@ def show():
         activity_factor = get_activity_factor(profile.activity_level)
         daily_calories = calculate_daily_calories(tmb, activity_factor, profile.goal)
         macros = calculate_macros(profile.weight, daily_calories, profile.goal)
-        workout_suggestion = suggest_workout(profile.goal)
 
         col1, col2, col3 = st.columns(3)
         col1.metric("IMC", f"{bmi}", "kg/m²")
@@ -123,7 +120,10 @@ def show():
         """, unsafe_allow_html=True)
 
         st.markdown("#### 🏋️ Sugestão de Treino")
-        st.info(workout_suggestion)
+        # Usa a função generate_workout_plan para pegar o primeiro dia como exemplo
+        plano = generate_workout_plan(profile.goal)
+        primeiro_dia = list(plano.keys())[0]
+        st.info(f"**{primeiro_dia} – {plano[primeiro_dia]['name']}**. Veja detalhes na página de Treino.")
 
         if st.button("Aplicar estas metas ao meu diário", use_container_width=True):
             store.set_daily_goals(user.id, daily_calories, macros['protein'])
