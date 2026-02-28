@@ -120,7 +120,6 @@ def show():
         """, unsafe_allow_html=True)
 
         st.markdown("#### 🏋️ Sugestão de Treino")
-        # Usa a função generate_workout_plan para pegar o primeiro dia como exemplo
         plano = generate_workout_plan(profile.goal)
         primeiro_dia = list(plano.keys())[0]
         st.info(f"**{primeiro_dia} – {plano[primeiro_dia]['name']}**. Veja detalhes na página de Treino.")
