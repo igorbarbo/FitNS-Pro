@@ -16,12 +16,11 @@ def render_navigation():
             st.session_state.page = "nutrition"
             st.rerun()
     with cols[3]:
-        if st.button("🍽️ Plano", use_container_width=True, key="nav_meal_plan"):  # Novo
+        if st.button("🍽️ Plano", use_container_width=True, key="nav_meal_plan"):
             st.session_state.page = "meal_plan"
             st.rerun()
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # Segunda linha opcional para Progresso e Perfil
     cols2 = st.columns(4)
     with cols2[0]:
         if st.button("📊 Perfil", use_container_width=True, key="nav_profile"):
@@ -31,4 +30,3 @@ def render_navigation():
         if st.button("📈 Progresso", use_container_width=True, key="nav_progress"):
             st.session_state.page = "progress"
             st.rerun()
-    # as outras colunas ficam vazias (podem ser usadas depois)
