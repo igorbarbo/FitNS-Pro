@@ -1,4 +1,21 @@
-"""
+import streamlit as st
+from modules.header import render_header
+from modules.navigation import render_navigation
+from modules.progress_bars import render_progress_bar
+
+def show():
+    # ... (código existente até o card do treino)
+    
+    # Botão que navega via URL (mais robusto)
+    st.markdown("""
+    <div style="text-align: center; margin-top: 10px;">
+        <a href="/?page=workout" target="_self" class="btn-neon" style="text-decoration: none; padding: 12px 30px; display: inline-block;">
+            🏋️ Iniciar Treino
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ... (resto do código)"""
 Dashboard Principal
 """
 import streamlit as st
