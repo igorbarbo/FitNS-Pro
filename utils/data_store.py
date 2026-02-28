@@ -3,7 +3,7 @@ import os
 import json
 from datetime import datetime
 from typing import List, Dict, Optional
-from .models import User, Meal, DailyStats, asdict
+from .models import User, Meal, DailyStats, UserProfile, asdict
 from config import Config
 
 class DataStore:
@@ -19,7 +19,8 @@ class DataStore:
                 "current_user": None,
                 "meals": {},
                 "daily_stats": {},
-                "weight_history": []
+                "weight_history": [],
+                "profiles": {}          # <-- NOVO
             }
             self._save_data(initial_data)
     
@@ -28,12 +29,13 @@ class DataStore:
             with open(self.file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
         except Exception:
-            return {"users": {}, "current_user": None, "meals": {}, "daily_stats": {}, "weight_history": []}
+            return {"users": {}, "current_user": None, "meals": {}, "daily_stats": {}, "weight_history": [], "profiles": {}}
     
     def _save_data(self, data: Dict):
         with open(self.file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     
+    # ========== Usuário ==========
     def get_current_user(self) -> Optional[User]:
         data = self._load_data()
         if data.get("current_user"):
@@ -51,6 +53,7 @@ class DataStore:
         data["current_user"] = None
         self._save_data(data)
     
+    # ========== Refeições ==========
     def get_today_meals(self, user_id: str) -> List[Meal]:
         data = self._load_data()
         today = datetime.now().strftime("%Y-%m-%d")
@@ -72,6 +75,7 @@ class DataStore:
             self._save_data(data)
             self._update_daily_stats(user_id)
     
+    # ========== Estatísticas Diárias ==========
     def get_today_stats(self, user_id: str) -> DailyStats:
         data = self._load_data()
         today = datetime.now().strftime("%Y-%m-%d")
@@ -93,14 +97,13 @@ class DataStore:
         if user_id not in data["daily_stats"]:
             data["daily_stats"][user_id] = {}
         
-        # Preserva água e treinos já registrados
         current_stats = data["daily_stats"][user_id].get(today, {})
         data["daily_stats"][user_id][today] = {
             "date": today,
             "calories_consumed": total_calories,
-            "calories_goal": Config.DEFAULT_CALORIES_GOAL,
+            "calories_goal": current_stats.get("calories_goal", Config.DEFAULT_CALORIES_GOAL),
             "protein_consumed": round(total_protein, 1),
-            "protein_goal": Config.DEFAULT_PROTEIN_GOAL,
+            "protein_goal": current_stats.get("protein_goal", Config.DEFAULT_PROTEIN_GOAL),
             "carbs_consumed": round(total_carbs, 1),
             "fat_consumed": round(total_fat, 1),
             "water_consumed": current_stats.get("water_consumed", 0),
@@ -122,6 +125,19 @@ class DataStore:
         data["daily_stats"][user_id][today]["water_consumed"] = round(current + amount, 1)
         self._save_data(data)
     
+    def set_daily_goals(self, user_id: str, calories: int, protein: float):
+        """Define metas personalizadas para o dia (usado pelo perfil)"""
+        data = self._load_data()
+        today = datetime.now().strftime("%Y-%m-%d")
+        if user_id not in data["daily_stats"]:
+            data["daily_stats"][user_id] = {}
+        if today not in data["daily_stats"][user_id]:
+            data["daily_stats"][user_id][today] = asdict(DailyStats(date=today))
+        data["daily_stats"][user_id][today]["calories_goal"] = calories
+        data["daily_stats"][user_id][today]["protein_goal"] = protein
+        self._save_data(data)
+    
+    # ========== Histórico de Peso ==========
     def get_weight_history(self, user_id: str) -> List[Dict]:
         data = self._load_data()
         return data.get("weight_history", [])
@@ -135,3 +151,18 @@ class DataStore:
         }
         data["weight_history"].append(entry)
         self._save_data(data)
+    
+    # ========== Perfil do Usuário ==========
+    def save_user_profile(self, profile: UserProfile):
+        data = self._load_data()
+        if "profiles" not in data:
+            data["profiles"] = {}
+        data["profiles"][profile.user_id] = asdict(profile)
+        self._save_data(data)
+    
+    def get_user_profile(self, user_id: str) -> Optional[UserProfile]:
+        data = self._load_data()
+        profile_dict = data.get("profiles", {}).get(user_id)
+        if profile_dict:
+            return UserProfile(**profile_dict)
+        return None
