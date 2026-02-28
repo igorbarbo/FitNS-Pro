@@ -20,7 +20,7 @@ class DataStore:
                 "meals": {},
                 "daily_stats": {},
                 "weight_history": [],
-                "profiles": {}          # <-- NOVO
+                "profiles": {}
             }
             self._save_data(initial_data)
     
@@ -35,7 +35,6 @@ class DataStore:
         with open(self.file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     
-    # ========== Usuário ==========
     def get_current_user(self) -> Optional[User]:
         data = self._load_data()
         if data.get("current_user"):
@@ -53,7 +52,6 @@ class DataStore:
         data["current_user"] = None
         self._save_data(data)
     
-    # ========== Refeições ==========
     def get_today_meals(self, user_id: str) -> List[Meal]:
         data = self._load_data()
         today = datetime.now().strftime("%Y-%m-%d")
@@ -75,7 +73,6 @@ class DataStore:
             self._save_data(data)
             self._update_daily_stats(user_id)
     
-    # ========== Estatísticas Diárias ==========
     def get_today_stats(self, user_id: str) -> DailyStats:
         data = self._load_data()
         today = datetime.now().strftime("%Y-%m-%d")
@@ -126,7 +123,6 @@ class DataStore:
         self._save_data(data)
     
     def set_daily_goals(self, user_id: str, calories: int, protein: float):
-        """Define metas personalizadas para o dia (usado pelo perfil)"""
         data = self._load_data()
         today = datetime.now().strftime("%Y-%m-%d")
         if user_id not in data["daily_stats"]:
@@ -137,7 +133,6 @@ class DataStore:
         data["daily_stats"][user_id][today]["protein_goal"] = protein
         self._save_data(data)
     
-    # ========== Histórico de Peso ==========
     def get_weight_history(self, user_id: str) -> List[Dict]:
         data = self._load_data()
         return data.get("weight_history", [])
@@ -152,7 +147,6 @@ class DataStore:
         data["weight_history"].append(entry)
         self._save_data(data)
     
-    # ========== Perfil do Usuário ==========
     def save_user_profile(self, profile: UserProfile):
         data = self._load_data()
         if "profiles" not in data:
