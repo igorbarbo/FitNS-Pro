@@ -1,4 +1,58 @@
 # utils/helpers.py
+import pulp
+from .food_database import FOODS
+
+def optimize_meal_plan(cal_goal, prot_goal, carb_goal, fat_goal):
+    """
+    Usa programação linear para encontrar quantidades (em gramas) de alimentos
+    que atendam às metas de macronutrientes, minimizando desvios e quantidade total.
+    """
+    prob = pulp.LpProblem("Dieta", pulp.LpMinimize)
+    
+    # Variáveis: quantidade de cada alimento em gramas (limitadas a 500g por alimento)
+    food_vars = [pulp.LpVariable(f"food_{i}", lowBound=0, upBound=500) for i in range(len(FOODS))]
+    
+    # Variáveis de desvio (positivo e negativo) para cada macro
+    dev_cal_p = pulp.LpVariable("dev_cal_p", lowBound=0)
+    dev_cal_n = pulp.LpVariable("dev_cal_n", lowBound=0)
+    dev_prot_p = pulp.LpVariable("dev_prot_p", lowBound=0)
+    dev_prot_n = pulp.LpVariable("dev_prot_n", lowBound=0)
+    dev_carb_p = pulp.LpVariable("dev_carb_p", lowBound=0)
+    dev_carb_n = pulp.LpVariable("dev_carb_n", lowBound=0)
+    dev_fat_p = pulp.LpVariable("dev_fat_p", lowBound=0)
+    dev_fat_n = pulp.LpVariable("dev_fat_n", lowBound=0)
+    
+    # Restrições: soma dos nutrientes + desvio = meta
+    prob += pulp.lpSum([(food["cal"]/100) * food_vars[i] for i, food in enumerate(FOODS)]) + dev_cal_n - dev_cal_p == cal_goal
+    prob += pulp.lpSum([(food["prot"]/100) * food_vars[i] for i, food in enumerate(FOODS)]) + dev_prot_n - dev_prot_p == prot_goal
+    prob += pulp.lpSum([(food["carb"]/100) * food_vars[i] for i, food in enumerate(FOODS)]) + dev_carb_n - dev_carb_p == carb_goal
+    prob += pulp.lpSum([(food["fat"]/100) * food_vars[i] for i, food in enumerate(FOODS)]) + dev_fat_n - dev_fat_p == fat_goal
+    
+    # Função objetivo: minimizar desvios (com peso 10) + quantidade total de alimentos (peso 1/100)
+    prob += (dev_cal_p + dev_cal_n) * 10 + (dev_prot_p + dev_prot_n) * 10 + \
+            (dev_carb_p + dev_carb_n) * 10 + (dev_fat_p + dev_fat_n) * 10 + \
+            pulp.lpSum(food_vars) / 100
+    
+    # Resolver
+    prob.solve(pulp.PULP_CBC_CMD(msg=0))
+    
+    if prob.status == pulp.LpStatusOptimal:
+        result = []
+        for i, var in enumerate(food_vars):
+            qtd = var.varValue
+            if qtd and qtd > 1:  # ignora quantidades insignificantes
+                food = FOODS[i]
+                result.append({
+                    "name": food["name"],
+                    "quantity": round(qtd, 1),
+                    "cal": round((food["cal"]/100) * qtd, 1),
+                    "prot": round((food["prot"]/100) * qtd, 1),
+                    "carb": round((food["carb"]/100) * qtd, 1),
+                    "fat": round((food["fat"]/100) * qtd, 1)
+                })
+        return result
+    else:
+        return None# utils/helpers.py
 from .food_database import FOODS
 
 def calculate_bmi(weight_kg: float, height_cm: float) -> float:
