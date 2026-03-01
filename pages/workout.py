@@ -38,3 +38,10 @@ def show():
         st.error(f"Erro na página de treino: {e}")
         import traceback
         st.code(traceback.format_exc())
+# Adicione instruções rápidas no workout.py
+st.info("""
+**Dicas importantes:**
+- 🔥 HIIT: 30s esforço máximo / 15s descanso
+- 💪 Musculação: escolha um peso que desafie nas últimas repetições
+- 🧘 Alongamento: segure cada posição por 30s
+""")
