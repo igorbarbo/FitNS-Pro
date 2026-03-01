@@ -3,7 +3,12 @@ import streamlit as st
 from config import Config
 from styles import load_css
 from utils.services import FitnessService
+# app.py - adicione 'my_plan' na importação
+from pages import login, dashboard, nutrition, workout, progress, profile, meal_plan, my_plan
 
+# ... no roteamento:
+elif page == "my_plan":
+    my_plan.show()
 # Configuração da página
 st.set_page_config(
     page_title="FitNS Pro",
