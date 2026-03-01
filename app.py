@@ -12,9 +12,11 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Carrega o CSS customizado
 load_css()
 
 def init_session_state():
+    """Inicializa as variáveis de estado da sessão"""
     if 'service' not in st.session_state:
         st.session_state.service = FitnessService()
     if 'user' not in st.session_state:
@@ -24,16 +26,29 @@ def init_session_state():
     if 'show_add_meal' not in st.session_state:
         st.session_state.show_add_meal = False
 
+# Inicializa a sessão ANTES de importar as páginas
 init_session_state()
 
-# Importa as páginas após a inicialização da sessão
-from pages import login, dashboard, nutrition, workout, progress, profile, meal_plan, my_plan
+# Importa todas as páginas (com a sessão já pronta)
+from pages import (
+    login, 
+    dashboard, 
+    nutrition, 
+    workout, 
+    progress, 
+    profile, 
+    meal_plan,
+    my_plan  # <-- NOVA PÁGINA ADICIONADA
+)
 
-# Roteamento
+# Roteamento das páginas
 if st.session_state.user is None:
+    # Se não há usuário logado, mostra a tela de login
     login.show()
 else:
+    # Usuário logado: navega entre as páginas
     page = st.session_state.page
+    
     if page == "dashboard":
         dashboard.show()
     elif page == "nutrition":
@@ -46,7 +61,8 @@ else:
         profile.show()
     elif page == "meal_plan":
         meal_plan.show()
-    elif page == "my_plan":
+    elif page == "my_plan":  # <-- NOVA PÁGINA
         my_plan.show()
     else:
+        # Página padrão caso algo dê errado
         dashboard.show()
